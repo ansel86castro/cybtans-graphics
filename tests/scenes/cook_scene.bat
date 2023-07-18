@@ -1,0 +1,1 @@
+SceneConverter.exe -path . -d ../playground3d/public/assets

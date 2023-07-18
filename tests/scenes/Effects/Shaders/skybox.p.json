@@ -1,0 +1,31 @@
+{
+    "Name":"skybox",
+    "VertexShader":{
+        "Location":"./skybox-vs.glsl",
+        "Inputs":{
+            "POSITION":"a_position"
+        },
+      "Parameters": {
+        "u_View": {
+          "Target": "Camera",
+          "Property": "viewMtx",
+          "Type": "mat4"
+        },
+        "u_Proj": {
+          "Target": "Camera",
+          "Property": "projMtx",
+          "Type": "mat4"
+        }
+      }
+    },
+    "FragmentShader":{
+      "Location":"./skybox-fs.glsl",
+      "Parameters": {
+        "u_CubeMap": {
+          "Target": "SkyBox",
+          "Property": "texture",
+          "Type": "samplerCUBE"
+        }
+      }
+    }
+}

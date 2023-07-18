@@ -1,0 +1,69 @@
+{
+  "Name": "Default",
+  "Programs": {
+    "Mesh": "default",
+    "SkyBox": "skybox",
+    "Billboard": "billboard"
+  },
+
+  "Predicates": {
+    "Mesh": {
+      "Items": [
+        {
+          "Condition": {
+            "Op": 2,
+            "Parameter": "NodeName",
+            "value": "SunStar"
+          },
+          "Program": "sun"
+        },
+        {
+          "AndConditions": [
+            {
+              "Op": 1,
+              "Parameter": "uCloudSampler"
+            },
+            {
+              "Op": 1,
+              "Parameter": "uNightSampler"
+            },
+            {
+              "Op": 1,
+              "Parameter": "uSpecularSampler"
+            }
+          ],
+          "Program": "earth"
+        },
+        {
+          "AndConditions": [
+            {
+              "Op": 1,
+              "Parameter": "uNormalSampler"
+            },
+            {
+              "Op": 1,
+              "Parameter": "uAtmosphere"
+            }
+          ],
+          "Program": "planet-normal"
+        },
+        {
+          "AndConditions": [
+            {
+              "Op": 1,
+              "Parameter": "uAtmosphere"
+            }
+          ],
+          "Program": "planet"
+        },
+        {
+          "Condition": {
+            "Op": 1,
+            "Parameter": "uNormalSampler"
+          },
+          "Program": "normal-map"
+        }
+      ]
+    }
+    }
+}

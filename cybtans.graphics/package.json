@@ -1,0 +1,36 @@
+{
+  "name": "cybtans-graphics",
+  "version": "1.0.0",
+  "description": "WebGL abstraction library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ansel86castro/cybtans-graphics.git"
+  },
+  "keywords": [
+    "cybtans",
+    "webgl"
+  ],
+  "author": "Ansel Castro Cabrera",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ansel86castro/cybtans-graphics/issues"
+  },
+  "homepage": "https://github.com/ansel86castro/cybtans-graphics#readme",
+  "dependencies": {
+    "base64-arraybuffer": "^0.2.0",
+    "bootstrap": "5.1.3",
+    "gl-matrix": "^3.3.0"
+  }
+}

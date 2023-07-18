@@ -1,0 +1,42 @@
+{
+    "Name":"billboard",
+    "VertexShader":{
+      "Location":"./billboard-vs.glsl",
+      "Inputs":{
+          "POSITION":"a_position",            
+          "TEXCOORD": "a_texCoord"            
+      },
+      "Parameters": {
+        "u_World": {
+          "Target": "Frame",
+          "Property": "worldMtx",
+          "Type": "mat4"
+        },
+        "u_Billboard": {
+          "Target": "BillboardManager",
+          "Property": "billboardMtx",
+          "Type": "mat4"
+        },    
+        "u_ViewProj": {
+          "Target": "Camera",
+          "Property": "viewProjMtx",
+          "Type": "mat4"
+        }
+      }
+    },
+    "FragmentShader":{
+      "Location":"./billboard-fs.glsl",
+      "Parameters": {     
+        "diffuse": {
+          "Target": "Billboard",
+          "Property": "color",
+          "Type": "float4"
+        },    
+        "uDiffuseSampler": {
+          "Target": "Billboard",
+          "Property": "texture",
+          "Type": "sampler2D"          
+        }
+      }
+    }
+}

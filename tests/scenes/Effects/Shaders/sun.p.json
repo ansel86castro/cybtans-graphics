@@ -1,0 +1,46 @@
+{
+    "Name":"sun",
+    "VertexShader":{
+      "Location": "./default-vs.glsl",
+        "Inputs":{
+            "POSITION":"a_position",
+            "NORMAL": "a_normal",
+            "TANGENT": "a_tangent",
+            "TEXCOORD": "a_texCoord",
+            "OCC_FACTOR":"a_occ"
+        },
+      "Parameters": {
+        "u_World": {
+          "Target": "Frame",
+          "Property": "worldMtx",
+          "Type": "mat4"
+        },
+        "u_WorldNormal": {
+          "Target": "Frame",
+          "Property": "worldTranformNormalMtx",
+          "Type": "mat4"
+        },
+        "u_ViewProj": {
+          "Target": "Camera",
+          "Property": "viewProjMtx",
+          "Type": "mat4"
+        }
+      }
+    },
+    "FragmentShader":{
+      "Location": "./sun-fs.glsl",
+      "Parameters": {
+        "uDiffuseSampler": {
+          "Target": "Material",
+          "Property": "DIFFUSE_MAP",
+          "Type": "sampler2D",
+          "path": "textures"
+        },
+        "NodeName": {
+          "Target": "Frame",
+          "Property": "name",
+          "Type": "none"          
+        }
+      }
+    }
+}

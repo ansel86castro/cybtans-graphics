@@ -1,0 +1,60 @@
+html,body, #root { height: 100%; margin: 0px; padding: 0px; }
+
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(1.5vmin);
+  color: white;
+  opacity: 0.3;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+#menu {
+  float: left;   
+}
+
+#menu ul{
+  list-style-type: none;  
+  padding: 1rem;
+}
+
+#menu ul li {
+  margin: 0px;
+  padding: 0px;
+}
+
+#menu li:hover {
+  color: blue;
+  cursor: pointer;
+}
+
+#main{
+  display: flex;
+  flex-grow: 1;  
+  background-color: black;
+  overflow: auto;
+}
