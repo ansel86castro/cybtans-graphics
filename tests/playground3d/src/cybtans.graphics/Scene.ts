@@ -1,8 +1,11 @@
 import { AmbientLight } from "./AmbientLight";
+import { Behavior } from "./Behaviors/Behavior";
 import { BillboardManager } from "./Billboard";
 import Camera from "./Camera";
+import { CameraComponent } from "./Frame/CameraComponent";
 import Frame, { FrameUpdateFunc } from "./Frame/Frame";
 import { LightComponent } from "./Frame/LightComponent";
+import { RendereableComponent } from "./Frame/RendereableComponent";
 import { IRenderable } from "./Interfaces";
 import Light from "./Light";
 import Material from "./Material";
@@ -30,6 +33,7 @@ export default class Scene implements IRenderable {
     currentCamera?: Camera;
     currentLight?: LightComponent;
     renderables: IRenderable[] = [];
+    transparents: RendereableComponent[] = [];
 
     cameras: Map<string, Camera> = new Map();
     lights: Light[] = [];
@@ -211,16 +215,31 @@ export default class Scene implements IRenderable {
             if (item.visible === true)
                 item.render(ctx);
         }
+
+        for (const item of this.transparents) {
+            if (item.visible === true)
+                item.render(ctx);
+        }
     }
 
-    addUpdate(func: UpdateFunc): () => void {
-        this.updates.push(func);
-        return () => {
-            let idx = this.updates.indexOf(func);
-            if (idx < 0) return;
 
-            this.updates.splice(idx, 1);
-        }
+    addBehavior(b:Behavior){
+        this.addUpdate(b.update);
+    }
+
+    removeBehavior(b:Behavior){
+        this.removeUpdate(b.update);
+    }
+
+    addUpdate(func: UpdateFunc){
+        this.updates.push(func);
+    }
+
+    removeUpdate(func:UpdateFunc){
+        let idx = this.updates.indexOf(func);
+        if (idx < 0) return;
+
+        this.updates.splice(idx, 1);
     }
 
     getNodeByName(name: string): Frame | null {
@@ -235,6 +254,15 @@ export default class Scene implements IRenderable {
 
             this.addUpdate(elapsed => func(elapsed, node!));
         }
+    }
+
+    onCameraUpdate(cameraComp:CameraComponent){
+        let camPos = cameraComp.frame.worldPosition;
+        for (const comp of this.transparents) {            
+            comp.calculateDistance(camPos);
+        }
+
+        this.transparents.sort((a,b)=>  a.distance < b.distance ? -1: a > b ? 1: 0 );
     }
 
     dispose() {

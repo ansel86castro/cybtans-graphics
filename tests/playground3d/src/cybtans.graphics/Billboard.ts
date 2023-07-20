@@ -12,8 +12,6 @@ import { TextureType } from "./models";
 import { isPostfixUnaryExpression } from "typescript";
 
 export interface Billboard {
-    width: number;
-    heigh: number;
     texture?: Texture2D;
     color: vec4;
 }
@@ -21,7 +19,7 @@ export interface Billboard {
 interface BillboardOptions{
     position?: vec3;
     scale?:vec3;
-    node?:string;  
+    node?:string|Frame;  
 }
 
 export class BillboardManager {
@@ -48,25 +46,19 @@ export class BillboardManager {
     constructor(public scene:Scene){        
     }
 
-    createBillboardComponent(frame: Frame, billboard:Partial<Billboard>){
+    private createBillboardComponent(frame: Frame, billboard:Partial<Billboard>){
         let b = billboard;
         if(!b.color){
             b.color = float4([1,1,1,1]);
         }
-        if(!b.width){
-            b.width = 20
-        }
-        if(!b.heigh){
-            b.heigh = 20;
-        }
+
         let component = new BillboardComponent(this, b as Billboard, frame);
         return component;
     }
 
-    async createComponentAsync(name:string, textureUrl:string, options?:BillboardOptions):Promise<{frame:Frame, texture:Texture}>{
+    create(name:string, textureUrl:string, options?:BillboardOptions):{frame:Frame, texture:Texture}{
         let frame = this.scene.addFrame(name);
-        let texture = this.scene.createTexture({ filename :textureUrl,type : TextureType.texture2d, id:'', format:Texture.FORMAT_RGBA });
-        await texture.load();
+        let texture = this.scene.createTexture({ filename :textureUrl,type : TextureType.texture2d, id:'', format:Texture.FORMAT_RGBA });        
         frame.component = this.createBillboardComponent(frame, {texture: texture});
         frame.initialize();
         if(options){
@@ -76,12 +68,16 @@ export class BillboardManager {
             if(options.position){
                 frame.position = options.position;
             }
-            if(options.node){
-                let node = this.scene.getNodeByName(options.node);
+            if(typeof options.node === 'string'){
+                let node = this.scene.getNodeByName(options.node);                
                 if(node){
                     frame.position = node.worldPosition;
                 }
+            }else if(options.node){
+                frame.position = options.node.worldPosition;
             }
+
+            
         }
         frame.commitChanges(true);
 
@@ -90,6 +86,7 @@ export class BillboardManager {
             texture
         };
     }
+    
 
     getBillboardMatrix(outMat: mat4, camPosition: vec3, camUp: vec3, position: vec3){        
         vec3.sub(this.w, camPosition, position);

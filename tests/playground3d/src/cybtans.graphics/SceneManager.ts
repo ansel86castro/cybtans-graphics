@@ -137,13 +137,14 @@ export default class SceneManager {
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        //gl.disable(gl.CULL_FACE);
-        // gl.cullFace(gl.BACK);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.FRONT);
 
         if (this.disposed === true || this.current == null) return;
 
         gl.enable(gl.BLEND);
-        gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+
         this.current.render(this);
     }
 

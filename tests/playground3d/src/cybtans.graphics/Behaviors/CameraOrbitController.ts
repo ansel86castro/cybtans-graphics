@@ -14,8 +14,8 @@ export default class CameraOrbitController extends Behavior {
     offset: number;
     updated: boolean = false;
 
-    constructor(scene: Scene, cameraNode: Frame, targetNode: Frame, offset = 0, speed = 1) {
-        super(scene, cameraNode);
+    constructor(cameraNode: Frame, targetNode: Frame, offset = 0, speed = 1) {
+        super(cameraNode);
 
         this.bindMtx = matrix();
         this.transform = matrix();

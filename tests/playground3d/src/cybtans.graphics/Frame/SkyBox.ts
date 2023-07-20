@@ -7,7 +7,7 @@ import Texture, { TextureCube } from "../Textures";
 
 export class SkyBox implements IRenderable {
     static readonly type = 'SkyBox';
-
+    distance = 0;
     visible = true;
     texture: Texture;
     mesh: Mesh;

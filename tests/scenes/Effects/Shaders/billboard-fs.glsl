@@ -12,5 +12,6 @@ out vec4 Color;
 void main() 
 {
     Color = texture(uDiffuseSampler, v_texCoord);
-       
+    if (Color.a < 0.001f)
+        discard;
 }

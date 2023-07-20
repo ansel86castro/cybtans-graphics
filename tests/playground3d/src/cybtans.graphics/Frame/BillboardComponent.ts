@@ -11,7 +11,7 @@ export class BillboardComponent extends RendereableComponent {
         }
 
     initialize(scene: Scene): void {
-        scene.renderables.push(this);
+        scene.transparents.push(this);
         super.initialize(scene);
     }
 

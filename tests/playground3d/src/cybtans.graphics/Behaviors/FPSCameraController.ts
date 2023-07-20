@@ -2,6 +2,7 @@ import { vec3 } from "gl-matrix";
 import { float3, toRadians, transformNormal } from "../MathUtils";
 import Scene from "../Scene";
 import { Behavior } from "./Behavior";
+import Frame from "../Frame/Frame";
 
 const INITIAL_ANGULAR_SPEED = 0.05;  
 const INITIAL_LINEAR_SPEED = 0;  
@@ -16,10 +17,10 @@ export class FpsCameraController extends Behavior {
     linearSpeed = INITIAL_LINEAR_SPEED;
     LinearAcc = 0.33;        
     moveDir = float3();
-    transformedDir =float3();
+    transformedDir =float3();    
 
-    constructor(scene: Scene, name: string) {
-        super(scene, name);
+    constructor(frame:Frame) {
+        super(frame);
 
     }
 

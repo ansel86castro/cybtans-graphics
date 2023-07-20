@@ -3,6 +3,7 @@ import { mat4, quat, ReadonlyMat4, vec3 } from "gl-matrix";
 export const UnitX = float3([1, 0, 0]);
 export const UnitY = float3([0, 1, 0]);
 export const UnitZ = float3([0, 0, 1]);
+export const Zero = float3([0,0,0]);
 export const PIover2 = Math.PI * 0.5;
 export const TwoPI = Math.PI * 2;
 export const Epsilon = 0.000005;
