@@ -1,7 +1,6 @@
 import SceneManager from "./SceneManager";
 
 export interface IRenderable {
-    visible: boolean;
-
+    visible: boolean;    
     render(context: SceneManager): void;
 }

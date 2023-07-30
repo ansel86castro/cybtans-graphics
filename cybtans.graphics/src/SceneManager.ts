@@ -4,7 +4,9 @@ import Program from "./Program";
 import EffectManager from "./EffectManager";
 import Scene from "./Scene";
 import EventEmitter from "./Events";
-import { MouseManager, ScrollManager } from "./Inputs";
+import { ScrollManager } from "./Inputs/ScrollManager";
+import { MouseManager } from "./Inputs/MouseManager";
+import { KeyBoardManager } from "./Inputs/KeyBoardManager";
 
 interface UpdateHandler {
     (elapsed: number): void;
@@ -25,21 +27,28 @@ export default class SceneManager {
     private lastTime?: number;
     private running: boolean = false;
     sizeChangedEmitter: EventEmitter<SceneManager, Size>;
-    mouse: MouseManager;
+    mouse?: MouseManager;
     scroll?: ScrollManager;
+    keyBoard?: KeyBoardManager;
 
     constructor(gl: WebGL2RenderingContext, canvas: HTMLCanvasElement) {
         this.effects = new EffectManager(gl);
         this.canvas = canvas;
         this.onFrame = this.onFrame.bind(this);
         this.gl = gl;
-        this.sizeChangedEmitter = new EventEmitter();
-        this.mouse = new MouseManager(canvas);
-
+        this.sizeChangedEmitter = new EventEmitter();        
     }
 
     captureScroll(el?: HTMLElement) {
         this.scroll = new ScrollManager(el);
+    }
+
+    captureMouse(el:HTMLElement){
+        this.mouse = new MouseManager(el);
+    }
+
+    captureKeyboard(el:HTMLElement){
+        this.keyBoard = new KeyBoardManager(el);
     }
 
     createScene() {
@@ -99,7 +108,7 @@ export default class SceneManager {
             this.updateHandler(this.elapsed);
         }
 
-        this.mouse.update(this.elapsed);
+        this.mouse?.update(this.elapsed);
         this.scroll?.update(this.elapsed);
 
         if (this.current) {
@@ -128,10 +137,13 @@ export default class SceneManager {
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        //gl.disable(gl.CULL_FACE);
-        // gl.cullFace(gl.BACK);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.FRONT);
 
         if (this.disposed === true || this.current == null) return;
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
         this.current.render(this);
     }
@@ -186,7 +198,7 @@ export default class SceneManager {
     }
 
     dispose() {
-        stop();
+        this.stop();
 
         for (const scene of this.scenes) {
             scene.dispose();

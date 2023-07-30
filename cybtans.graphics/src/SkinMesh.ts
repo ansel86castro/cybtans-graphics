@@ -32,7 +32,8 @@ export default class MeshSkin {
         }
 
         if (data.rootBone) {
-            this.root = new Frame(scene, data.rootBone);
+            this.root = new Frame(scene, data.rootBone.name!);
+            this.root.setFrameDto(data.rootBone);
             let map = this.root.unwrap();
             this.bones = data.bones?.map(x => map[x]);
         }

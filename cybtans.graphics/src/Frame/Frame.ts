@@ -3,7 +3,7 @@ import { euler, eulerFromAxis, float3, getRotationAxis, matrix, matRotationYawPi
 import { FrameDto, FrameType } from "../models";
 import Scene from "../Scene";
 import { decomposeMatrix } from "../MathUtils";
-import { HashMap } from "../utils";
+import { HashMap, uuidv4 } from "../utils";
 import { FrameComponent } from "./FrameComponent";
 import { CameraComponent } from "./CameraComponent";
 import { MeshComponent } from "./MeshComponent";
@@ -45,8 +45,37 @@ export default class Frame implements IAffector {
     private _worldPosition: vec3;
     private _localPosition: vec3;
 
-    constructor(scene: Scene, data: FrameDto, parent?: Frame | null) {
+    constructor(scene: Scene, name: string, parent?: Frame | null) {
         this.scene = scene;
+        this.id = uuidv4();
+        this.name = name;
+        this.localMtx = matrix();
+        this.bindParentMtx = matrix();
+        this.worldMtx = matrix();
+        this.bindAffectorMtx = matrix();
+        this.worldTranformNormalMtx = matrix();
+        this.up = float3();
+        this.front = float3();
+        this.right = float3();
+        this.euler = float3();
+        this._worldPosition = float3();
+        this._localPosition = float3();
+        this.type = FrameType.frame;
+        this.range = 1000;        
+        this.parent = parent;
+        this.localScale = mat4.create();
+        this.localTranslation = mat4.create();
+        this.localRotation = mat4.create();
+
+        this.updateTransforms();
+
+        this._worldPosition = this._localPosition;
+
+        mat4.invert(this.worldTranformNormalMtx, this.worldMtx);
+        mat4.transpose(this.worldTranformNormalMtx, this.worldTranformNormalMtx);
+    }
+
+    setFrameDto(data:FrameDto){
         this.id = data.id;
         this.name = data.name;
         this.localMtx = matrix(data.localTransform);
@@ -62,8 +91,7 @@ export default class Frame implements IAffector {
         this._localPosition = float3();
         this.type = data.type;
         this.range = data.range;
-        this.tag = data.tag;
-        this.parent = parent;
+        this.tag = data.tag;      
         this.localScale = mat4.create();
         this.localTranslation = mat4.create();
         this.localRotation = mat4.create();
@@ -77,7 +105,8 @@ export default class Frame implements IAffector {
 
         if (data.childrens) {
             for (const item of data.childrens) {
-                let c = new Frame(scene, item, this);
+                let c = new Frame(this.scene, item.name!, this);
+                c.setFrameDto(item);
                 this.childrens?.push(c);
                 if (c.name) {
                     this.childresMap[c.name] = c;
@@ -87,22 +116,21 @@ export default class Frame implements IAffector {
 
         if (data.component) {
             if (data.component.camera) {
-                this.component = new CameraComponent(scene.cameras.get(data.component.camera)!, this);
+                this.component = new CameraComponent(this.scene.cameras.get(data.component.camera)!, this);
             } else if (data.component.light) {
-                this.component = new LightComponent(scene.lights.find(x => x.id === data.component?.light?.light)!,
+                this.component = new LightComponent(this.scene.lights.find(x => x.id === data.component?.light?.light)!,
                     data.component.light, this);
             } else if (data.component.mesh) {
-                let materials = data.component.mesh.materials!.map(x => scene.materials.get(x)!);
-                let mesh = scene.meshes.get(data.component.mesh.mesh)!;
+                let materials = data.component.mesh.materials!.map(x => this.scene.materials.get(x)!);
+                let mesh = this.scene.meshes.get(data.component.mesh.mesh)!;
                 this.component = new MeshComponent(mesh, materials, this);
             } else if (data.component.meshSkin) {
-                let materials = data.component.meshSkin.materials!.map(x => scene.materials.get(x)!);
-                let skin = scene.skins.get(data.component.meshSkin.meshSkin)!;
+                let materials = data.component.meshSkin.materials!.map(x => this.scene.materials.get(x)!);
+                let skin = this.scene.skins.get(data.component.meshSkin.meshSkin)!;
                 this.component = new MeshSkinComponent(skin, materials, this);
             }
         }
     }
-
 
     //*************************** NODE MANAGEMENT *****************************/
     addNode(node: Frame) {
@@ -160,13 +188,13 @@ export default class Frame implements IAffector {
         return map;
     }
 
-    initialize(scene: Scene) {
+    initialize() {
         if (this.component) {
-            this.component.initialize(scene);
+            this.component.initialize(this.scene);
         }
 
         for (const item of this.childrens) {
-            item.initialize(scene);
+            item.initialize();
         }
     }
 
@@ -209,9 +237,9 @@ export default class Frame implements IAffector {
     }
 
     scale(x: number, y: number, z: number) {
-        this.localTranslation[0] += x;
-        this.localTranslation[5] += y;
-        this.localTranslation[10] += z;
+        this.localScale[0] = x;
+        this.localScale[5] = y;
+        this.localScale[10] = z;
     }
 
     rotateX(rad: number) {

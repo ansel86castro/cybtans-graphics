@@ -2,22 +2,27 @@ import { CubeMapDto, TextureDto, TextureType } from "./models";
 import Scene from "./Scene";
 import { checkError } from "./utils";
 
+type TextureFormat = 'rgb'|'rgba';
+
 export default abstract class Texture {
+
+    static FORMAT_RGBA: TextureFormat = 'rgba';
+    static FORMAT_RGB: TextureFormat = 'rgb';
 
     id: string;
     protected type: TextureType;
-    protected format?: string | null;
+    protected format: string|null;
     protected glTexture: WebGLTexture | null = null;
     protected gl: WebGL2RenderingContext;
 
     constructor(gl: WebGL2RenderingContext, data: TextureDto) {
         this.type = data.type;
-        this.format = data.format;
+        this.format = data.format|| 'rgb';
         this.id = data.id;
         this.gl = gl;
     }
 
-    abstract load(baseUrl: string): Promise<void>;
+    abstract load(baseUrl?: string): Promise<void>;
 
     abstract setTexture(textureSlot: number): void;
 
@@ -41,7 +46,7 @@ export class Texture2D extends Texture {
     }
 
 
-    async load(baseUrl: string) {
+    async load(baseUrl?: string) {
         if (!this.url)
             throw new Error('Url not defined');
 
@@ -54,8 +59,15 @@ export class Texture2D extends Texture {
 
         let gl = this.gl;
         let texture = this.glTexture;
+        
+        if(!baseUrl){
+            baseUrl = "";
+        }
+        else if(!baseUrl.endsWith("/")){
+            baseUrl+='/';
+        }
 
-        let imageUrl = `${baseUrl}/${this.url}`;
+        let imageUrl = `${baseUrl}${this.url}`;
         //requestCORSIfNotSameOrigin(image, imageUrl);
         //image.src =imageUrl;
 
@@ -81,7 +93,14 @@ export class Texture2D extends Texture {
 
                 checkError(gl);
 
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+                switch(this.format){                   
+                    case Texture.FORMAT_RGBA:
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, image);
+                    break;    
+                    default:
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB8, gl.RGB, gl.UNSIGNED_BYTE, image);                    
+                }                
+
                 checkError(gl);
 
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

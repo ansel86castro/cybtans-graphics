@@ -36,6 +36,10 @@ export const VertexDefinitions = {
         { semantic: Semantics.Position, format: VertexElementFormat.float, size: 3 },
         { semantic: Semantics.Normal, format: VertexElementFormat.float, size: 3 },
         { semantic: Semantics.TextureCoordinate, format: VertexElementFormat.float, size: 2 }
+    ]),
+    PTVertex: createVertexDefinition([
+        { semantic: Semantics.Position, format: VertexElementFormat.float, size: 3 },
+        { semantic: Semantics.TextureCoordinate, format: VertexElementFormat.float, size: 2 }
     ])
 };
 
@@ -63,3 +67,9 @@ export interface MeshVertex {
     Normal: vec3;
     TCoords: vec2;
 }
+
+export interface VertexPTx {
+    Pos: vec3;
+    texCoord: vec2;
+}
+

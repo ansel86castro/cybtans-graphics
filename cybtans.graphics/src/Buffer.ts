@@ -121,6 +121,22 @@ export class VertexBuffer extends ByteBuffer {
                 throw new Error('Format not supported');
         }
     }
+
+    // getFloat32Array(array:any[], vd:VertexDefinitionDto){
+    //     let elements = vd.elements!;
+    //     let floats = elements.map(v=>v.size).reduce((x,y)=>x+y);
+    //     let buffer = new Float32Array(array.length * floats);
+    //     let offset = 0;
+    //     for (let i = 0; i < array.length; i++) {
+    //         const v = array[i];   
+    //         for(let j = 0; j < elements.length; j++){
+    //             let e = elements[j];
+    //             for (let k = 0; k < e.size; k++){
+    //                 buffer[i * floats + j*e.size + k] = v
+    //             }
+    //         }
+    //     }
+    // }   
 }
 
 export class IndexBuffer extends ByteBuffer {

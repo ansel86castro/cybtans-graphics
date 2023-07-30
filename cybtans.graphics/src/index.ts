@@ -4,7 +4,12 @@ export * from './Camera';
 export * from './Effect';
 export * from './EffectManager';
 export * from './IAffector';
-export * from './Inputs';
+export * from './Inputs/KeyBoardManager';
+export * from './Inputs/MouseManager';
+export * from './Inputs/ScrollManager';
+export * from './Behaviors/Behavior';
+export * from './Behaviors/CameraControllers';
+export * from './Behaviors/CameraOrbitController';
 export * from './Interfaces';
 export * from './Light';
 export * from './Material';
@@ -12,6 +17,6 @@ export * from './Mesh';
 export * from './models';
 export * from './Program';
 export * from './Scene';
-export * from './SceneManager'
+export * from "./SceneManager"
 export * from './SkinMesh'
-export * from './Textures'
+

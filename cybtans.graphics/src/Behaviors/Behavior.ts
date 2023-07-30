@@ -4,33 +4,22 @@ import Scene from "../Scene";
 import SceneManager from "../SceneManager";
 
 export class Behavior {
-    frame: Frame;
-    scene: Scene;
-    name?: string;
-    sceneManager: SceneManager;
+    frame: Frame;    
+    name?: string;    
     protected onUpdate: EventEmitter<Behavior, number>;
 
-    constructor(scene: Scene, name: string | Frame) {
-        if (typeof name === 'string') {
-            let node = scene.getNodeByName(name);
-            if (!node) throw new Error(`node ${name} found`);
-            this.frame = node;
-            this.name = name;
-        } else {
-            this.frame = name;
-            this.name = this.frame.name || '';
-        }
+    constructor(frame:Frame) {    
+        this.frame = frame;        
 
-        this.scene = scene;
-        this.sceneManager = scene.manager;
         this.update = this.update.bind(this);
-
-        this.onUpdate = new EventEmitter();
-
-        scene.addUpdate(this.update);
+        this.onUpdate = new EventEmitter();        
     }
 
     update(elapsed: number) {
         this.onUpdate.raiseEvent(this, elapsed);
     }
+
+    get scene(){ return this.frame.scene;}
+    get sceneManager() { return this.frame.scene.manager;}
+    
 }

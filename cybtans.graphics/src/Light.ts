@@ -5,7 +5,6 @@ import { LightDto, LightType } from "./models";
 export default class Light {
     static readonly type = 'Light';
 
-
     diffuse: vec3;
     specular: vec3;
     ambient: vec3;
@@ -25,7 +24,7 @@ export default class Light {
         this.enable = data.enable;
         this.spotPower = data.spotPower;
         this.type = data.type;
-        this.range = data.range;
+        this.range = data.range || 100;
         this.id = data.id;
         this.intensity = data.intensity;
     }

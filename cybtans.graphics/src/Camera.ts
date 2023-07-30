@@ -1,6 +1,6 @@
 import { mat4, vec2, vec3 } from "gl-matrix";
 import Frame from "./Frame/Frame";
-import { float3, matrix } from "./MathUtils";
+import { decomposeMatrix, float3, getRotationAxisNormalized, matrix } from "./MathUtils";
 import { CameraDto, ProjectionType } from "./models";
 import SceneManager from "./SceneManager";
 
@@ -22,6 +22,9 @@ export default class Camera {
     viewInvertMtx: mat4;
     id: string;
     position: vec3;
+    up:vec3;
+    right:vec3;
+    front:vec3;
 
     constructor(data: CameraDto) {
         this.projType = data.projType || ProjectionType.perspective;
@@ -39,7 +42,9 @@ export default class Camera {
         this.viewProjMtx = matrix();
         this.viewInvertMtx = matrix();
         this.position = float3();
-
+        this.up = float3();
+        this.right = float3();
+        this.front = float3();
         this.projMtx = mat4.perspective(this.projMtx, this.fieldOfView, this.width / this.height, this.nearPlane, this.farPlane);
 
         this.onViewUpdated();
@@ -76,6 +81,8 @@ export default class Camera {
         this.position[0] = this.viewInvertMtx[12];
         this.position[1] = this.viewInvertMtx[13];
         this.position[2] = this.viewInvertMtx[14];
+        
+        getRotationAxisNormalized(this.up, this.front , this.right, this.viewInvertMtx);
     }
 
 }

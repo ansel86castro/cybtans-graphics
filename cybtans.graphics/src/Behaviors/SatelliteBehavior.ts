@@ -15,7 +15,7 @@ export default class SatelliteBehavior extends Behavior implements IAffector {
     worldMtx: mat4 = matrix();
 
     constructor(scene: Scene, frame: Frame | string, target: Frame | string) {
-        super(scene, frame);
+        super(typeof(frame) === 'string' ? scene.getNodeByName(frame)!: frame);
 
         if (typeof target === 'string') {
             let node = scene.getNodeByName(target);

@@ -13,7 +13,7 @@ export class CameraComponent extends FrameComponent {
 
     onFrameUpdate() {
         this.camera.transform(this.frame);
-
+        this.frame.scene.onCameraUpdate(this);
         super.onFrameUpdate();
     }
 }

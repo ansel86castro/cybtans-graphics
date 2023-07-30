@@ -3,6 +3,7 @@ import { mat4, quat, ReadonlyMat4, vec3 } from "gl-matrix";
 export const UnitX = float3([1, 0, 0]);
 export const UnitY = float3([0, 1, 0]);
 export const UnitZ = float3([0, 0, 1]);
+export const Zero = float3([0,0,0]);
 export const PIover2 = Math.PI * 0.5;
 export const TwoPI = Math.PI * 2;
 export const Epsilon = 0.000005;
@@ -45,6 +46,40 @@ export function float3(list?: number[] | null) {
     }
     if (list.length != 3) throw new Error("invalid vector3");
     return new Float32Array(list);
+}
+
+export function float3L(x:number, y?:number, z?:number){
+    let arr = new Float32Array(3);
+    arr[0] = x;
+    arr[1] = x;
+    arr[2] = x;
+
+    if(y){
+        arr[1] = y;
+    }
+    if(z){
+        arr[2] = z;
+    }
+    return arr;
+}
+
+export function float4L(x:number, y?:number, z?:number, w?:number){
+    let arr = new Float32Array(4);
+    arr[0] = x;
+    arr[1] = x;
+    arr[2] = x;
+    arr[3] = x;
+    
+    if(y){
+        arr[1] = y;
+    }
+    if(z){
+        arr[2] = z;
+    }
+    if(w){
+        arr[3] = w;
+    }
+    return arr;
 }
 
 export function float2(list?: number[] | null) {

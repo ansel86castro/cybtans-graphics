@@ -1,16 +1,20 @@
 import { AmbientLight } from "./AmbientLight";
+import { Behavior } from "./Behaviors/Behavior";
+import { BillboardManager } from "./Billboard";
 import Camera from "./Camera";
+import { CameraComponent } from "./Frame/CameraComponent";
 import Frame, { FrameUpdateFunc } from "./Frame/Frame";
 import { LightComponent } from "./Frame/LightComponent";
+import { RendereableComponent } from "./Frame/RendereableComponent";
 import { IRenderable } from "./Interfaces";
 import Light from "./Light";
 import Material from "./Material";
 import Mesh from "./Mesh";
-import { SceneDto, Uomtype } from "./models";
+import { SceneDto, TextureDto, TextureType, Uomtype } from "./models";
 import SceneManager from "./SceneManager";
 import MeshSkin from "./SkinMesh";
 import SkinMesh from "./SkinMesh";
-import Texture, { createTexture } from "./Textures";
+import Texture, { createTexture, Texture2D, TextureCube } from "./Textures";
 
 export type UpdateFunc = (elapsed: number) => void;
 
@@ -29,6 +33,7 @@ export default class Scene implements IRenderable {
     currentCamera?: Camera;
     currentLight?: LightComponent;
     renderables: IRenderable[] = [];
+    transparents: RendereableComponent[] = [];
 
     cameras: Map<string, Camera> = new Map();
     lights: Light[] = [];
@@ -37,6 +42,7 @@ export default class Scene implements IRenderable {
     materials: Map<string, Material> = new Map();
     meshes: Map<string, Mesh> = new Map();
     skins: Map<string, SkinMesh> = new Map();
+    billboards: BillboardManager;
     private updates: UpdateFunc[] = [];
 
     constructor(manager: SceneManager, id?: string, name?: string) {
@@ -48,6 +54,7 @@ export default class Scene implements IRenderable {
         this.unitOfMeasure = Uomtype.meters;
         this.cameras = new Map();
         this.ambient = new AmbientLight();
+        this.billboards = new BillboardManager(this);
     }
 
     loadData(data: SceneDto) {
@@ -99,20 +106,60 @@ export default class Scene implements IRenderable {
         }
 
         if (!this.root && data.root) {
-            this.root = new Frame(this, data.root);
+            this.root = new Frame(this, data.root.name || 'root');
+            this.root.setFrameDto(data.root);
+
             this.root.commitChanges();
-            this.root.initialize(this);
+            this.root.initialize();
         }
         else if (this.root && data.root) {
-            let dataRoot = new Frame(this, data.root);
+            let dataRoot = new Frame(this, data.root.name!);
+            dataRoot.setFrameDto(data.root);
+            
             dataRoot.commitChanges();
-            dataRoot.initialize(this);
+            dataRoot.initialize();
 
             this.root.addNode(dataRoot);
         }
 
         return textures;
     }
+
+    createTexture(data:TextureDto): Texture {
+        if (!data.type) throw new Error('texture type not defined');
+
+        if(data.id == ''){
+            data.id = data.filename || 'texture-'+this.textures.keys.length;
+        }
+
+        if(this.textures.has(data.id)){
+            return this.textures.get(data.id)!;
+        }
+        
+        let tex:Texture;
+        
+        switch (data.type) {
+            case TextureType.texture2d:
+                tex = new Texture2D(this.gl, data);
+                break;
+            case TextureType.textureCube:
+                tex = new TextureCube(this.gl, data);
+                break;
+            default:
+                throw new Error('texture type not supported');
+        }
+
+        this.textures?.set(tex.id, tex);
+        return tex;
+    }
+
+
+    addFrame(name:string){
+        let frame = new Frame(this, name);
+        this.root?.addNode(frame);
+        return frame;
+    }
+
 
     getTextureById(id: any): Texture | undefined {
         return this.textures?.get(id);
@@ -168,16 +215,31 @@ export default class Scene implements IRenderable {
             if (item.visible === true)
                 item.render(ctx);
         }
+
+        for (const item of this.transparents) {
+            if (item.visible === true)
+                item.render(ctx);
+        }
     }
 
-    addUpdate(func: UpdateFunc): () => void {
-        this.updates.push(func);
-        return () => {
-            let idx = this.updates.indexOf(func);
-            if (idx < 0) return;
 
-            this.updates.splice(idx, 1);
-        }
+    addBehavior(b:Behavior){
+        this.addUpdate(b.update);
+    }
+
+    removeBehavior(b:Behavior){
+        this.removeUpdate(b.update);
+    }
+
+    addUpdate(func: UpdateFunc){
+        this.updates.push(func);
+    }
+
+    removeUpdate(func:UpdateFunc){
+        let idx = this.updates.indexOf(func);
+        if (idx < 0) return;
+
+        this.updates.splice(idx, 1);
     }
 
     getNodeByName(name: string): Frame | null {
@@ -192,6 +254,15 @@ export default class Scene implements IRenderable {
 
             this.addUpdate(elapsed => func(elapsed, node!));
         }
+    }
+
+    onCameraUpdate(cameraComp:CameraComponent){
+        let camPos = cameraComp.frame.worldPosition;
+        for (const comp of this.transparents) {            
+            comp.calculateDistance(camPos);
+        }
+
+        this.transparents.sort((a,b)=>  a.distance < b.distance ? -1: a > b ? 1: 0 );
     }
 
     dispose() {
